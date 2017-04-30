@@ -1,0 +1,22 @@
+{
+  "name": "elmman",
+  "version": "0.0.1",
+  "description": "A Pacman clone in Elm.",
+  "main": "index.js",
+  "scripts": {
+    "debug": "elm-live src/Main.elm --output assets/elm.js --open --debug",
+    "start": "node_modules/.bin/elm-live src/Main.elm --output assets/elm.js --open",
+    "test": "node_modules/.bin/elm-package install -y && node_modules/.bin/elm-test tests/Main.elm"
+  },
+  "keywords": [
+    "pacman",
+    "elm"
+  ],
+  "author": "Gina Vasiloff",
+  "license": "ISC",
+  "devDependencies": {
+    "elm": "0.18.0",
+    "elm-live": "2.7.4",
+    "elm-test": "0.18.2"
+  }
+}
