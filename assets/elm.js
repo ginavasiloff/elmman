@@ -11317,63 +11317,118 @@ var _evancz$elm_graphics$Collage$ngon = F2(
 				A2(_elm_lang$core$List$range, 0, n - 1)));
 	});
 
+var _user$project$Main$displayFood = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_evancz$elm_graphics$Collage$move,
+		{ctor: '_Tuple2', _0: _p1._0, _1: _p1._1},
+		A2(
+			_evancz$elm_graphics$Collage$filled,
+			_elm_lang$core$Color$white,
+			_evancz$elm_graphics$Collage$circle(5)));
+};
 var _user$project$Main$pacman = _evancz$elm_graphics$Collage$toForm(
 	A3(_evancz$elm_graphics$Element$image, 25, 25, 'assets/Original_PacMan.png'));
 var _user$project$Main$view = function (model) {
-	return _evancz$elm_graphics$Element$toHtml(
-		A3(
-			_evancz$elm_graphics$Collage$collage,
-			500,
-			500,
-			{
-				ctor: '::',
-				_0: A2(
-					_evancz$elm_graphics$Collage$filled,
-					_elm_lang$core$Color$blue,
-					A2(_evancz$elm_graphics$Collage$rect, 500, 100)),
-				_1: {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{ctor: '[]'},
+				{
 					ctor: '::',
-					_0: A2(_evancz$elm_graphics$Collage$move, model.pacman, _user$project$Main$pacman),
+					_0: _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'score: ',
+							_elm_lang$core$Basics$toString(model.score))),
 					_1: {ctor: '[]'}
-				}
-			}));
+				}),
+			_1: {
+				ctor: '::',
+				_0: _evancz$elm_graphics$Element$toHtml(
+					A3(
+						_evancz$elm_graphics$Collage$collage,
+						500,
+						500,
+						{
+							ctor: '::',
+							_0: A2(
+								_evancz$elm_graphics$Collage$filled,
+								_elm_lang$core$Color$blue,
+								A2(_evancz$elm_graphics$Collage$rect, 500, 100)),
+							_1: {
+								ctor: '::',
+								_0: A2(_evancz$elm_graphics$Collage$move, model.pacman, _user$project$Main$pacman),
+								_1: {
+									ctor: '::',
+									_0: _evancz$elm_graphics$Collage$group(
+										A2(_elm_lang$core$List$map, _user$project$Main$displayFood, model.food)),
+									_1: {ctor: '[]'}
+								}
+							}
+						})),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$Main$init = A2(
 	_elm_lang$core$Platform_Cmd_ops['!'],
 	{
-		pacman: {ctor: '_Tuple2', _0: 230, _1: 0}
+		pacman: {ctor: '_Tuple2', _0: 230, _1: 0},
+		score: 0,
+		food: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 50, _1: 0},
+			_1: {ctor: '[]'}
+		}
 	},
 	{ctor: '[]'});
+var _user$project$Main$movePacmanY = F2(
+	function (initialPos, distance) {
+		var _p2 = function (_p3) {
+			var _p4 = _p3;
+			return {ctor: '_Tuple2', _0: _p4._0, _1: _p4._1 + distance};
+		}(initialPos);
+		var x = _p2._0;
+		var y_ = _p2._1;
+		return {
+			ctor: '_Tuple2',
+			_0: x,
+			_1: A3(_elm_lang$core$Basics$clamp, -40, 40, y_)
+		};
+	});
+var _user$project$Main$movePacmanX = F2(
+	function (initialPos, distance) {
+		var _p5 = function (_p6) {
+			var _p7 = _p6;
+			return {ctor: '_Tuple2', _0: _p7._0 + distance, _1: _p7._1};
+		}(initialPos);
+		var x_ = _p5._0;
+		var y = _p5._1;
+		return {
+			ctor: '_Tuple2',
+			_0: A3(_elm_lang$core$Basics$clamp, -240, 240, x_),
+			_1: y
+		};
+	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
+		var _p8 = msg;
 		var pacman = function () {
-			var _p1 = _p0._0;
-			switch (_p1) {
+			var _p9 = _p8._0;
+			switch (_p9) {
 				case 39:
-					return function (_p2) {
-						var _p3 = _p2;
-						var x_ = A3(_elm_lang$core$Basics$clamp, -250, 240, _p3._0 + 10);
-						return {ctor: '_Tuple2', _0: x_, _1: _p3._1};
-					}(model.pacman);
+					return A2(_user$project$Main$movePacmanX, model.pacman, 10);
 				case 37:
-					return function (_p4) {
-						var _p5 = _p4;
-						var x_ = A3(_elm_lang$core$Basics$clamp, -240, 240, _p5._0 - 10);
-						return {ctor: '_Tuple2', _0: x_, _1: _p5._1};
-					}(model.pacman);
+					return A2(_user$project$Main$movePacmanX, model.pacman, -10);
 				case 38:
-					return function (_p6) {
-						var _p7 = _p6;
-						var y_ = A3(_elm_lang$core$Basics$clamp, -40, 40, _p7._1 + 10);
-						return {ctor: '_Tuple2', _0: _p7._0, _1: y_};
-					}(model.pacman);
+					return A2(_user$project$Main$movePacmanY, model.pacman, 10);
 				case 40:
-					return function (_p8) {
-						var _p9 = _p8;
-						var y_ = A3(_elm_lang$core$Basics$clamp, -40, 40, _p9._1 - 10);
-						return {ctor: '_Tuple2', _0: _p9._0, _1: y_};
-					}(model.pacman);
+					return A2(_user$project$Main$movePacmanY, model.pacman, -10);
 				default:
 					return model.pacman;
 			}
@@ -11385,9 +11440,10 @@ var _user$project$Main$update = F2(
 				{pacman: pacman}),
 			{ctor: '[]'});
 	});
-var _user$project$Main$Model = function (a) {
-	return {pacman: a};
-};
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {pacman: a, score: b, food: c};
+	});
 var _user$project$Main$KeyMsg = function (a) {
 	return {ctor: 'KeyMsg', _0: a};
 };

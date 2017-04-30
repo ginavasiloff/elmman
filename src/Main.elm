@@ -9,6 +9,8 @@ import Element
 
 type alias Model =
   { pacman : (Float, Float)
+  , score : Int
+  , food : List (Float, Float)
   }
 
 type Msg
@@ -23,59 +25,58 @@ update msg model =
         pacman =
           case code of
             39 ->
-              (\(x, y) ->
-                let
-                  x_ =
-                    clamp -250 240 (x + 10)
-                in
-                  ( x_ , y)
-              ) model.pacman
+              movePacmanX model.pacman 10
             37 ->
-              (\(x, y) ->
-                let
-                  x_ =
-                    clamp -240 240 (x - 10)
-                in
-                  (x_, y)
-              ) model.pacman
+              movePacmanX model.pacman -10
             38 ->
-              (\(x, y) ->
-                let
-                  y_ =
-                    clamp -40 40 (y+10)
-                in
-                  (x, y_) ) model.pacman
+              movePacmanY model.pacman 10
             40 ->
-              (\(x, y) ->
-                let
-                  y_ =
-                    clamp -40 40 ( y - 10 )
-                in
-                  (x, y_)
-               ) model.pacman
+              movePacmanY model.pacman -10
             _ -> model.pacman
       in
         { model | pacman = pacman } ! []
 
+movePacmanX : (Float, Float) -> Float -> (Float, Float)
+movePacmanX initialPos distance =
+  let
+    (x_, y)  = (\(x,y) -> (x + distance, y) ) initialPos
+  in
+    ( clamp -240 240 x_, y)
 
+movePacmanY : (Float, Float) -> Float -> (Float, Float)
+movePacmanY initialPos distance =
+  let
+    (x, y_)  = (\(x,y) -> (x, y + distance ) ) initialPos
+  in
+    (x, clamp -40 40 y_ )
 
 init : (Model, Cmd msg)
 init =
   { pacman = (230, 0)
+  , score = 0
+  , food = [(50, 0)]
   } ! []
 
 
 view : Model -> Html msg
 view model =
-  Element.toHtml
-  <| Collage.collage 500 500
-    [ Collage.rect 500 100 |> Collage.filled Color.blue
-    , Collage.move model.pacman pacman
+  Html.div []
+    [ Html.span [] [ Html.text <| "score: " ++ toString model.score ]
+    , Element.toHtml
+      <| Collage.collage 500 500
+      [ Collage.rect 500 100 |> Collage.filled Color.blue
+      , Collage.move model.pacman pacman
+      , Collage.group <| List.map displayFood model.food
+      ]
     ]
 
 pacman : Collage.Form
 pacman =
   Element.image 25 25 "assets/Original_PacMan.png" |> Collage.toForm
+
+displayFood : (Float, Float) -> Collage.Form
+displayFood (x,y) =
+  Collage.move (x,y) ( Collage.circle 5 |> Collage.filled Color.white )
 
 main : Program Never Model Msg
 main =
