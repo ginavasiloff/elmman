@@ -11415,12 +11415,62 @@ var _user$project$Main$movePacmanX = F2(
 			_1: y
 		};
 	});
+var _user$project$Main$checkFoodCollision = F2(
+	function (_p9, _p8) {
+		var _p10 = _p9;
+		var _p15 = _p10._1;
+		var _p14 = _p10._0;
+		var _p11 = _p8;
+		var _p13 = _p11._1;
+		var _p12 = _p11._0;
+		var yOverlap = ((_elm_lang$core$Native_Utils.cmp(_p13, _p15) < 1) && (_elm_lang$core$Native_Utils.cmp(_p15, _p13 + 25) < 1)) || ((_elm_lang$core$Native_Utils.cmp(_p13, _p15 + 5) < 1) && (_elm_lang$core$Native_Utils.cmp(_p15 + 5, _p13 + 25) < 1));
+		var xOverlap = ((_elm_lang$core$Native_Utils.cmp(_p12, _p14) < 1) && (_elm_lang$core$Native_Utils.cmp(_p14, _p12 + 25) < 1)) || ((_elm_lang$core$Native_Utils.cmp(_p12, _p14 + 5) < 1) && (_elm_lang$core$Native_Utils.cmp(_p14 + 5, _p12 + 25) < 1));
+		return xOverlap && yOverlap;
+	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p8 = msg;
+		var _p16 = msg;
+		var _p17 = A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (food, _p18) {
+					var _p19 = _p18;
+					var _p22 = _p19._1;
+					var _p21 = _p19._0;
+					var _p20 = A2(_user$project$Main$checkFoodCollision, food, model.pacman);
+					if (_p20 === true) {
+						return {
+							ctor: '_Tuple2',
+							_0: {ctor: '::', _0: food, _1: _p21},
+							_1: _p22
+						};
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _p21,
+							_1: {ctor: '::', _0: food, _1: _p22}
+						};
+					}
+				}),
+			{
+				ctor: '_Tuple2',
+				_0: {ctor: '[]'},
+				_1: {ctor: '[]'}
+			},
+			model.food);
+		var eaten = _p17._0;
+		var notEaten = _p17._1;
+		var score = function () {
+			var _p23 = _elm_lang$core$List$length(eaten);
+			if (_p23 === 0) {
+				return model.score;
+			} else {
+				return _p23 + model.score;
+			}
+		}();
 		var pacman = function () {
-			var _p9 = _p8._0;
-			switch (_p9) {
+			var _p24 = _p16._0;
+			switch (_p24) {
 				case 39:
 					return A2(_user$project$Main$movePacmanX, model.pacman, 10);
 				case 37:
@@ -11437,7 +11487,7 @@ var _user$project$Main$update = F2(
 			_elm_lang$core$Platform_Cmd_ops['!'],
 			_elm_lang$core$Native_Utils.update(
 				model,
-				{pacman: pacman}),
+				{pacman: pacman, score: score, food: notEaten}),
 			{ctor: '[]'});
 	});
 var _user$project$Main$Model = F3(

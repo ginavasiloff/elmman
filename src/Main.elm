@@ -33,8 +33,37 @@ update msg model =
             40 ->
               movePacmanY model.pacman -10
             _ -> model.pacman
+
+        (eaten, notEaten) =
+          List.foldl
+            (\food (eaten, notEaten) ->
+              case checkFoodCollision food model.pacman of
+                True -> (food :: eaten, notEaten)
+                False -> (eaten, food :: notEaten)
+            ) ([],[]) model.food
+
+       -- eaten = List.filter (checkFoodCollision model.pacman)  model.food
+
+        score =
+          case List.length eaten of
+            0 -> model.score
+            n -> n + model.score
       in
-        { model | pacman = pacman } ! []
+        { model
+        | pacman = pacman
+        , score = score
+        , food = notEaten
+        } ! []
+
+checkFoodCollision : (Float, Float) -> (Float, Float) -> Bool
+checkFoodCollision (foodX, foodY) (pacX, pacY) =
+  let
+    xOverlap =
+      ((pacX <= foodX) && (foodX <= pacX + 25)) || ((pacX <= foodX + 5) && (foodX + 5  <= pacX + 25 ))
+    yOverlap =
+      ((pacY <= foodY) && (foodY <= pacY + 25)) || ((pacY  <= foodY + 5) && (foodY + 5 <= pacY + 25))
+  in
+     xOverlap && yOverlap
 
 movePacmanX : (Float, Float) -> Float -> (Float, Float)
 movePacmanX initialPos distance =
