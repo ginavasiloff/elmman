@@ -7,15 +7,12 @@ import Html exposing (Html)
 import Collage
 import Element
 
+import Sprite exposing (Sprite)
+
 type alias Model =
   { pacman : Sprite
   , score : Int
   , food : List (Float, Float)
-  }
-
-type alias Sprite =
-  { position : (Float, Float)
-  , rotate : Float
   }
 
 type Msg
@@ -29,14 +26,14 @@ update msg model =
       let
         pacman =
           case code of
-            39 -> movePacmanX model.pacman 10
-            37 -> movePacmanX model.pacman -10
-            38 -> movePacmanY model.pacman 10
-            40 -> movePacmanY model.pacman -10
+            39 -> Sprite.moveSpriteX model.pacman 10
+            37 -> Sprite.moveSpriteX model.pacman -10
+            38 -> Sprite.moveSpriteY model.pacman 10
+            40 -> Sprite.moveSpriteY model.pacman -10
             _ -> model.pacman
 
         (eaten, notEaten) =
-          List.partition (checkFoodCollision model.pacman.position) model.food
+          List.partition (Sprite.detectCollision model.pacman.position) model.food
 
       in
         { model
@@ -45,40 +42,6 @@ update msg model =
         , food = notEaten
         } ! []
 
-checkFoodCollision : (Float, Float) -> (Float, Float) -> Bool
-checkFoodCollision (foodX, foodY) (pacX, pacY) =
-  let
-    xOverlap =
-      ((pacX <= foodX) && (foodX <= pacX + 25)) || ((pacX <= foodX + 5) && (foodX + 5  <= pacX + 25 ))
-    yOverlap =
-      ((pacY <= foodY) && (foodY <= pacY + 25)) || ((pacY  <= foodY + 5) && (foodY + 5 <= pacY + 25))
-  in
-     xOverlap && yOverlap
-
-movePacmanX : Sprite -> Float -> Sprite
-movePacmanX pacman distance =
-  let
-    (x_, y)  = (\(x,y) -> (x + distance, y) ) pacman.position
-    rotate =
-       case distance > 0 of
-         True -> degrees 180
-         False -> degrees 0
-  in
-   { pacman
-   |  position = ( clamp -240 240 x_, y)
-   , rotate = rotate
-    }
-
-movePacmanY : Sprite -> Float -> Sprite
-movePacmanY pacman distance =
-  let
-    (x, y_)  = (\(x,y) -> (x, y + distance ) ) pacman.position
-    rotate =
-      case distance > 0 of
-        True -> degrees 270
-        False -> degrees 90
-  in
-    { pacman | position = (x, clamp -40 40 y_ ), rotate = rotate }
 
 init : (Model, Cmd msg)
 init =
