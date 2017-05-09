@@ -8,9 +8,14 @@ import Collage
 import Element
 
 type alias Model =
-  { pacman : (Float, Float)
+  { pacman : Sprite
   , score : Int
   , food : List (Float, Float)
+  }
+
+type alias Sprite =
+  { position : (Float, Float)
+  , rotate : Float
   }
 
 type Msg
@@ -24,34 +29,19 @@ update msg model =
       let
         pacman =
           case code of
-            39 ->
-              movePacmanX model.pacman 10
-            37 ->
-              movePacmanX model.pacman -10
-            38 ->
-              movePacmanY model.pacman 10
-            40 ->
-              movePacmanY model.pacman -10
+            39 -> movePacmanX model.pacman 10
+            37 -> movePacmanX model.pacman -10
+            38 -> movePacmanY model.pacman 10
+            40 -> movePacmanY model.pacman -10
             _ -> model.pacman
 
         (eaten, notEaten) =
-          List.foldl
-            (\food (eaten, notEaten) ->
-              case checkFoodCollision food model.pacman of
-                True -> (food :: eaten, notEaten)
-                False -> (eaten, food :: notEaten)
-            ) ([],[]) model.food
+          List.partition (checkFoodCollision model.pacman.position) model.food
 
-       -- eaten = List.filter (checkFoodCollision model.pacman)  model.food
-
-        score =
-          case List.length eaten of
-            0 -> model.score
-            n -> n + model.score
       in
         { model
         | pacman = pacman
-        , score = score
+        , score = model.score + List.length eaten
         , food = notEaten
         } ! []
 
@@ -65,25 +55,36 @@ checkFoodCollision (foodX, foodY) (pacX, pacY) =
   in
      xOverlap && yOverlap
 
-movePacmanX : (Float, Float) -> Float -> (Float, Float)
-movePacmanX initialPos distance =
+movePacmanX : Sprite -> Float -> Sprite
+movePacmanX pacman distance =
   let
-    (x_, y)  = (\(x,y) -> (x + distance, y) ) initialPos
+    (x_, y)  = (\(x,y) -> (x + distance, y) ) pacman.position
+    rotate =
+       case distance > 0 of
+         True -> degrees 180
+         False -> degrees 0
   in
-    ( clamp -240 240 x_, y)
+   { pacman
+   |  position = ( clamp -240 240 x_, y)
+   , rotate = rotate
+    }
 
-movePacmanY : (Float, Float) -> Float -> (Float, Float)
-movePacmanY initialPos distance =
+movePacmanY : Sprite -> Float -> Sprite
+movePacmanY pacman distance =
   let
-    (x, y_)  = (\(x,y) -> (x, y + distance ) ) initialPos
+    (x, y_)  = (\(x,y) -> (x, y + distance ) ) pacman.position
+    rotate =
+      case distance > 0 of
+        True -> degrees 270
+        False -> degrees 90
   in
-    (x, clamp -40 40 y_ )
+    { pacman | position = (x, clamp -40 40 y_ ), rotate = rotate }
 
 init : (Model, Cmd msg)
 init =
-  { pacman = (230, 0)
+  { pacman = { position = (230, 0), rotate = 0 }
   , score = 0
-  , food = [(50, 0)]
+  , food = [(50, 0), (25, 0), (0,0), (-25, 0) ]
   } ! []
 
 
@@ -94,7 +95,7 @@ view model =
     , Element.toHtml
       <| Collage.collage 500 500
       [ Collage.rect 500 100 |> Collage.filled Color.blue
-      , Collage.move model.pacman pacman
+      , Collage.rotate model.pacman.rotate <| Collage.move model.pacman.position pacman
       , Collage.group <| List.map displayFood model.food
       ]
     ]
