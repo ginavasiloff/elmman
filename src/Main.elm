@@ -12,7 +12,7 @@ import Sprite exposing (Sprite)
 type alias Model =
   { pacman : Sprite
   , score : Int
-  , food : List (Float, Float)
+  , food : List Sprite
   }
 
 type Msg
@@ -33,7 +33,7 @@ update msg model =
             _ -> model.pacman
 
         (eaten, notEaten) =
-          List.partition (Sprite.detectCollision model.pacman.position) model.food
+          List.partition (Sprite.detectCollision model.pacman) model.food
 
       in
         { model
@@ -45,9 +45,9 @@ update msg model =
 
 init : (Model, Cmd msg)
 init =
-  { pacman = { position = (230, 0), rotate = 0 }
+  { pacman = { position = (230, 0), rotate = 0, dimensions = (25,25) }
   , score = 0
-  , food = [(50, 0), (25, 0), (0,0), (-25, 0) ]
+  , food = List.map Sprite.food [(50, 0), (25, 0), (0,0), (-25, 0) ]
   } ! []
 
 
@@ -67,9 +67,9 @@ pacman : Collage.Form
 pacman =
   Element.image 25 25 "assets/Original_PacMan.png" |> Collage.toForm
 
-displayFood : (Float, Float) -> Collage.Form
-displayFood (x,y) =
-  Collage.move (x,y) ( Collage.circle 5 |> Collage.filled Color.white )
+displayFood : Sprite -> Collage.Form
+displayFood sprite =
+  Collage.move sprite.position ( Collage.circle 5 |> Collage.filled Color.white )
 
 main : Program Never Model Msg
 main =

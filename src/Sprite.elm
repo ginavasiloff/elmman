@@ -3,19 +3,33 @@ module Sprite exposing (..)
 
 type alias Sprite =
   { position : (Float, Float)
+  , dimensions : (Float, Float)
   , rotate : Float
   }
 
 
-detectCollision : (Float, Float) -> (Float, Float) -> Bool
-detectCollision (ax, ay) (bx, by) =
+food : (Float, Float) -> Sprite
+food position =
+  { position = position
+  , dimensions = (5,5)
+  , rotate = 0
+  }
+
+
+detectCollision : Sprite -> Sprite -> Bool
+detectCollision sprite1 sprite2 =
   let
-    xOverlap =
-      ((bx <= ax) && (ax <= bx + 25)) || ((bx <= ax + 5) && (ax + 5 <= bx + 25))
-    yOverlap =
-      ((by <= ay) && (ay <= by + 25)) || ((by <= ay + 5) && (ay + 5 <= by + 25))
+    (ax, ay) = sprite1.position
+    (bx, by) = sprite2.position
+    (heightA, widthA) = sprite1.dimensions
+    (heightB, widthB) = sprite2.dimensions
+    xOverlap1 = (bx <= ax) && (ax <= bx + widthB)
+    xOverlap2 = (bx <= ax + widthA) && (ax + widthA <= bx + widthB)
+    yOverlap1 = (by <= ay) && (ay <= by + 25)
+    yOverlap2 = (by <= ay + heightA) && (ay + heightA <= by + heightB)
   in
-     xOverlap && yOverlap
+    (xOverlap1 || xOverlap2) && (yOverlap1 || yOverlap2)
+
 
 moveSpriteX : Sprite -> Float -> Sprite
 moveSpriteX sprite distance =
@@ -29,7 +43,7 @@ moveSpriteX sprite distance =
    { sprite
    |  position = ( clamp -240 240 x_, y)
    , rotate = rotate
-    }
+   }
 
 moveSpriteY : Sprite -> Float -> Sprite
 moveSpriteY sprite distance =
