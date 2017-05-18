@@ -1,4 +1,4 @@
-#elmman
+# elmman
 A just-for fun pacman clone in elm. Still in development.
 
 ## Requirements
